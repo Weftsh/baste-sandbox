@@ -2,8 +2,21 @@
 # a real machine against real GitHub. See docs/manual-testing.md.
 name: CI
 on: push
+permissions:
+  contents: read
+  statuses: read
 jobs:
+  baste-gate:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.gate.outputs.skip }}
+    steps:
+      - id: gate
+        uses: weftsh/baste/gate@v1
+
   build:
+    needs: baste-gate
+    if: needs.baste-gate.outputs.skip != 'true'
     runs-on: ubuntu-latest
     outputs:
       arch: ${{ steps.info.outputs.arch }}
